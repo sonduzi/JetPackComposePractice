@@ -6,10 +6,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,20 +28,36 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.bmi.ui.theme.JetpackComposePracticeTheme
+import kotlin.math.pow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HomeScreen()
+            val navController = rememberNavController()
+
+            NavHost(navController = navController, startDestination = "Home"){
+                composable(route="Home"){
+                    HomeScreen(navController)
+                }
+                composable(route="Result"){
+                    ResultScreen(navController, bmi = 35.0)
+                }
+            }
+
         }
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(){
+fun HomeScreen(navController: NavController){
     val (height, setHeight) = rememberSaveable {
         mutableStateOf("")
     }
@@ -70,7 +90,9 @@ fun HomeScreen(){
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = {},
+                onClick = {
+                    navController.navigate("Result")
+                },
                 modifier = Modifier.align(Alignment.End),
             ){
                 Text("결과")
@@ -80,11 +102,20 @@ fun HomeScreen(){
 }
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ResultScreen(bmi : Double){
+fun ResultScreen(navController: NavController, bmi : Double){
     Scaffold(
         topBar = {
             TopAppBar(
-               title = {Text("비만도 계산기")}
+               title = {Text("비만도 계산기")},
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "home",
+                        modifier = Modifier.clickable{
+                            navController.popBackStack()
+                        }
+                    )
+                }
             )
         }
     ){
@@ -105,10 +136,4 @@ fun ResultScreen(bmi : Double){
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun Preveiw(){
-    ResultScreen(bmi = 35.0)
 }
