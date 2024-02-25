@@ -16,3 +16,4 @@ rootProject.name = "JetpackComposePractice"
 include ':app'
 include ':bmi'
 include ':webbrowser'
+include ':mygallery'
